@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TravelMate - Contact</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="nav container">
+    <div class="brand">TravelMate</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 24px; color: #1f2937; text-align: center;">Get In Touch</h1>
+    
+    <div class="contact-container">
+      <div class="contact-info">
+        <h3>We're here to help you plan your perfect trip!</h3>
+        <p style="color: var(--muted); margin-bottom: 24px;">Our travel experts are available 24/7 to assist you with destination planning, itinerary creation, and travel tips.</p>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <div class="contact-item">
+            <div class="icon">📧</div>
+            <div>
+              <strong>Email Support</strong><br>
+              support@travelmate.com
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📱</div>
+            <div>
+              <strong>Phone</strong><br>
+              +91 9060322889
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">💬</div>
+            <div>
+              <strong>Live Chat</strong><br>
+              Available 24/7
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">🕒</div>
+            <div>
+              <strong>Response Time</strong><br>
+              Within 2 hours
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form id="contactForm" onsubmit="submitContact(event)" class="contact-form">
+        <h3 style="margin: 0 0 20px; color: #1f2937;">Send us a Message</h3>
+        
+        <label for="cname">Your Name *</label>
+        <input type="text" id="cname" placeholder="Enter your full name" required />
+        
+        <label for="cemail">Email Address *</label>
+        <input type="email" id="cemail" placeholder="your.email@example.com" required />
+        
+        <label for="csubject">Subject</label>
+        <input type="text" id="csubject" placeholder="What can we help you with?" />
+        
+        <label for="cmessage">Message *</label>
+        <textarea id="cmessage" placeholder="Tell us about your travel plans, questions, or feedback..." required></textarea>
+        
+        <button class="btn" type="submit" style="margin-top: 8px;">
+          📤 Send Message
+        </button>
+      </form>
+      
+      <div id="contact-success" class="hidden" style="background: var(--success); color: white; padding: 16px; border-radius: var(--radius); text-align: center; margin-top: 16px;">
+        ✅ Thank you! Your message has been recorded successfully. We'll get back to you within 2 hours.
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">TravelMate</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year4"></span> TravelMate — Let's plan your next adventure
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="css/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TravelMate - Destinations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">TravelMate</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html" class="active">Destinations</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+
+
+  <main class="container">
+    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 24px; color: #1f2937; text-align: center;">Discover Amazing Destinations</h1>
+
+    <div class="search-container">
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="Search destinations (e.g., Goa, mountains, beaches)" />
+        <button onclick="searchDest()" class="btn">Search</button>
+      </div>
+      
+      <div class="search-filters">
+        <div class="filter-chip active" data-category="all">All Destinations</div>
+        <div class="filter-chip" data-category="beach">Beaches</div>
+        <div class="filter-chip" data-category="mountain">Mountains</div>
+        <div class="filter-chip" data-category="cultural">Cultural</div>
+        <div class="filter-chip" data-category="adventure">Adventure</div>
+      </div>
+    </div>
+
+    <div class="cards fade-in" id="dest-cards"></div>
+  </main>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">TravelMate</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year2"></span> TravelMate — Your journey begins here
+      </div>
+    </div>
+  </footer>
+
+
+  <script src="css/js/script.js"></script>
+  <script>renderDestinationCards();</script>
+</body>
+</html>
