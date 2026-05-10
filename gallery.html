@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Photo Gallery - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html" class="active">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="gallery-header">
+      <h1>Travel Gallery</h1>
+      <p>Discover amazing destinations through the eyes of fellow travelers</p>
+      
+      <div class="gallery-actions">
+        <button class="btn" onclick="openUploadModal()">📸 Upload Photos</button>
+        <div class="gallery-filters">
+          <select id="destinationFilter" onchange="filterGallery()">
+            <option value="">All Destinations</option>
+            <option value="goa">Goa</option>
+            <option value="manali">Manali</option>
+            <option value="jaipur">Jaipur</option>
+            <option value="kerala">Kerala</option>
+            <option value="agra">Agra</option>
+            <option value="kashmir">Kashmir</option>
+            <option value="ladakh">Ladakh</option>
+            <option value="andaman">Andaman</option>
+          </select>
+          <select id="categoryFilter" onchange="filterGallery()">
+            <option value="">All Categories</option>
+            <option value="landscape">Landscapes</option>
+            <option value="culture">Culture</option>
+            <option value="food">Food</option>
+            <option value="adventure">Adventure</option>
+            <option value="people">People</option>
+          </select>
+          <select id="sortBy" onchange="sortGallery()">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="popular">Most Popular</option>
+            <option value="trending">Trending</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="gallery-stats">
+      <div class="stat-item">
+        <span class="stat-number" id="totalPhotos">1,234</span>
+        <span class="stat-label">Photos</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="totalDestinations">8</span>
+        <span class="stat-label">Destinations</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" id="totalContributors">456</span>
+        <span class="stat-label">Contributors</span>
+      </div>
+    </div>
+
+    <div class="gallery-grid" id="galleryGrid"></div>
+
+    <div class="load-more-container">
+      <button class="btn-secondary" onclick="loadMorePhotos()">Load More Photos</button>
+    </div>
+  </main>
+
+  <!-- Upload Modal -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Upload Photos</h2>
+        <button class="close-btn" onclick="closeUploadModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="uploadForm" onsubmit="uploadPhotos(event)">
+          <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📸</div>
+            <h3>Drag & Drop Photos Here</h3>
+            <p>or click to browse files</p>
+            <input type="file" id="photoInput" multiple accept="image/*" onchange="handleFileSelect(event)" />
+          </div>
+          
+          <div class="upload-preview" id="uploadPreview"></div>
+          
+          <div class="form-group">
+            <label>Destination</label>
+            <select id="uploadDestination" required>
+              <option value="">Select Destination</option>
+              <option value="goa">Goa</option>
+              <option value="manali">Manali</option>
+              <option value="jaipur">Jaipur</option>
+              <option value="kerala">Kerala</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Category</label>
+            <select id="uploadCategory" required>
+              <option value="">Select Category</option>
+              <option value="landscape">Landscapes</option>
+              <option value="culture">Culture</option>
+              <option value="food">Food</option>
+              <option value="adventure">Adventure</option>
+              <option value="people">People</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Description (Optional)</label>
+            <textarea id="uploadDescription" rows="3" placeholder="Tell us about these photos..."></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+            <button type="submit" class="btn">Upload Photos</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox-content">
+      <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+      <button class="lightbox-prev" onclick="prevPhoto()">‹</button>
+      <button class="lightbox-next" onclick="nextPhoto()">›</button>
+      
+      <div class="lightbox-image-container">
+        <img id="lightboxImage" src="" alt="" />
+      </div>
+      
+      <div class="lightbox-info">
+        <div class="photo-details">
+          <h3 id="photoTitle"></h3>
+          <p id="photoDescription"></p>
+          <div class="photo-meta">
+            <span id="photoDestination"></span>
+            <span id="photoCategory"></span>
+            <span id="photoDate"></span>
+          </div>
+        </div>
+        
+        <div class="photo-actions">
+          <button class="action-btn" onclick="likePhoto()">
+            <span id="likeIcon">🤍</span>
+            <span id="likeCount">0</span>
+          </button>
+          <button class="action-btn" onclick="sharePhoto()">
+            📤 Share
+          </button>
+          <button class="action-btn" onclick="downloadPhoto()">
+            💾 Download
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let photos = [
+      {
+        id: 1,
+        src: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=800',
+        thumb: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=300',
+        title: 'Sunset at Baga Beach',
+        description: 'Beautiful sunset view from Baga Beach, Goa',
+        destination: 'goa',
+        category: 'landscape',
+        date: '2024-01-15',
+        likes: 24,
+        photographer: 'John Doe',
+        isLiked: false
+      },
+      {
+        id: 2,
+        src: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=800',
+        thumb: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=300',
+        title: 'Manali Mountains',
+        description: 'Snow-capped peaks of Manali in winter',
+        destination: 'manali',
+        category: 'landscape',
+        date: '2024-01-10',
+        likes: 18,
+        photographer: 'Jane Smith',
+        isLiked: false
+      },
+      {
+        id: 3,
+        src: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=800',
+        thumb: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?w=300',
+        title: 'Hawa Mahal Architecture',
+        description: 'The iconic Palace of Winds in Jaipur',
+        destination: 'jaipur',
+        category: 'culture',
+        date: '2024-01-08',
+        likes: 32,
+        photographer: 'Mike Johnson',
+        isLiked: true
+      }
+    ];
+
+    let currentPhotoIndex = 0;
+    let filteredPhotos = [...photos];
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGallery();
+      setupUploadArea();
+    });
+
+    function loadGallery() {
+      const grid = document.getElementById('galleryGrid');
+      grid.innerHTML = filteredPhotos.map((photo, index) => `
+        <div class="gallery-item" onclick="openLightbox(${index})">
+          <img src="${photo.thumb}" alt="${photo.title}" loading="lazy" />
+          <div class="gallery-overlay">
+            <div class="gallery-info">
+              <h4>${photo.title}</h4>
+              <p>${photo.destination.toUpperCase()}</p>
+            </div>
+            <div class="gallery-stats">
+              <span>${photo.isLiked ? '❤️' : '🤍'} ${photo.likes}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('totalPhotos').textContent = filteredPhotos.length;
+      document.getElementById('totalDestinations').textContent = new Set(filteredPhotos.map(p => p.destination)).size;
+      document.getElementById('totalContributors').textContent = new Set(filteredPhotos.map(p => p.photographer)).size;
+    }
+
+    function filterGallery() {
+      const destination = document.getElementById('destinationFilter').value;
+      const category = document.getElementById('categoryFilter').value;
+      
+      filteredPhotos = photos.filter(photo => {
+        return (!destination || photo.destination === destination) &&
+               (!category || photo.category === category);
+      });
+      
+      loadGallery();
+    }
+
+    function sortGallery() {
+      const sortBy = document.getElementById('sortBy').value;
+      
+      switch(sortBy) {
+        case 'newest':
+          filteredPhotos.sort((a, b) => new Date(b.date) - new Date(a.date));
+          break;
+        case 'oldest':
+          filteredPhotos.sort((a, b) => new Date(a.date) - new Date(b.date));
+          break;
+        case 'popular':
+          filteredPhotos.sort((a, b) => b.likes - a.likes);
+          break;
+        case 'trending':
+          filteredPhotos.sort((a, b) => (b.likes / Math.max(1, (new Date() - new Date(b.date)) / (1000 * 60 * 60 * 24))) - 
+                                       (a.likes / Math.max(1, (new Date() - new Date(a.date)) / (1000 * 60 * 60 * 24))));
+          break;
+      }
+      
+      loadGallery();
+    }
+
+    function openLightbox(index) {
+      currentPhotoIndex = index;
+      const photo = filteredPhotos[index];
+      
+      document.getElementById('lightboxImage').src = photo.src;
+      document.getElementById('photoTitle').textContent = photo.title;
+      document.getElementById('photoDescription').textContent = photo.description;
+      document.getElementById('photoDestination').textContent = photo.destination.toUpperCase();
+      document.getElementById('photoCategory').textContent = photo.category;
+      document.getElementById('photoDate').textContent = formatDate(photo.date);
+      document.getElementById('likeIcon').textContent = photo.isLiked ? '❤️' : '🤍';
+      document.getElementById('likeCount').textContent = photo.likes;
+      
+      document.getElementById('lightbox').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function prevPhoto() {
+      currentPhotoIndex = (currentPhotoIndex - 1 + filteredPhotos.length) % filteredPhotos.length;
+      openLightbox(currentPhotoIndex);
+    }
+
+    function nextPhoto() {
+      currentPhotoIndex = (currentPhotoIndex + 1) % filteredPhotos.length;
+      openLightbox(currentPhotoIndex);
+    }
+
+    function likePhoto() {
+      const photo = filteredPhotos[currentPhotoIndex];
+      photo.isLiked = !photo.isLiked;
+      photo.likes += photo.isLiked ? 1 : -1;
+      
+      document.getElementById('likeIcon').textContent = photo.isLiked ? '❤️' : '🤍';
+      document.getElementById('likeCount').textContent = photo.likes;
+      
+      loadGallery();
+    }
+
+    function sharePhoto() {
+      const photo = filteredPhotos[currentPhotoIndex];
+      if (navigator.share) {
+        navigator.share({
+          title: photo.title,
+          text: photo.description,
+          url: photo.src
+        });
+      } else {
+        navigator.clipboard.writeText(photo.src);
+        alert('Photo link copied to clipboard!');
+      }
+    }
+
+    function downloadPhoto() {
+      const photo = filteredPhotos[currentPhotoIndex];
+      const link = document.createElement('a');
+      link.href = photo.src;
+      link.download = `${photo.title}.jpg`;
+      link.click();
+    }
+
+    function openUploadModal() {
+      document.getElementById('uploadModal').style.display = 'flex';
+    }
+
+    function closeUploadModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      document.getElementById('uploadForm').reset();
+      document.getElementById('uploadPreview').innerHTML = '';
+    }
+
+    function setupUploadArea() {
+      const uploadArea = document.getElementById('uploadArea');
+      const fileInput = document.getElementById('photoInput');
+      
+      uploadArea.addEventListener('click', () => fileInput.click());
+      
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('drag-over');
+      });
+      
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('drag-over');
+      });
+      
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('drag-over');
+        handleFiles(e.dataTransfer.files);
+      });
+    }
+
+    function handleFileSelect(event) {
+      handleFiles(event.target.files);
+    }
+
+    function handleFiles(files) {
+      const preview = document.getElementById('uploadPreview');
+      preview.innerHTML = '';
+      
+      Array.from(files).forEach((file, index) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const div = document.createElement('div');
+            div.className = 'upload-preview-item';
+            div.innerHTML = `
+              <img src="${e.target.result}" alt="Preview ${index + 1}" />
+              <button type="button" onclick="removePreview(this)">×</button>
+            `;
+            preview.appendChild(div);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    function removePreview(button) {
+      button.parentElement.remove();
+    }
+
+    function uploadPhotos(event) {
+      event.preventDefault();
+      
+      const destination = document.getElementById('uploadDestination').value;
+      const category = document.getElementById('uploadCategory').value;
+      const description = document.getElementById('uploadDescription').value;
+      
+      if (!destination || !category) {
+        alert('Please select destination and category');
+        return;
+      }
+      
+      // Simulate upload
+      alert('Photos uploaded successfully! 🎉');
+      closeUploadModal();
+    }
+
+    function loadMorePhotos() {
+      // Simulate loading more photos
+      alert('Loading more photos...');
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (document.getElementById('lightbox').style.display === 'flex') {
+        switch(e.key) {
+          case 'Escape':
+            closeLightbox();
+            break;
+          case 'ArrowLeft':
+            prevPhoto();
+            break;
+          case 'ArrowRight':
+            nextPhoto();
+            break;
+        }
+      }
+    });
+  </script>
+
+  <style>
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .gallery-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      color: #1f2937;
+    }
+
+    .gallery-header p {
+      color: var(--muted);
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+    }
+
+    .gallery-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .gallery-filters {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .gallery-filters select {
+      padding: 0.5rem 1rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      background: white;
+      font-size: 0.875rem;
+    }
+
+    .gallery-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    .gallery-stats .stat-item {
+      text-align: center;
+    }
+
+    .gallery-stats .stat-number {
+      display: block;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .gallery-stats .stat-label {
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 4/3;
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.7));
+      color: white;
+      padding: 1.5rem 1rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .gallery-item:hover .gallery-overlay {
+      opacity: 1;
+    }
+
+    .gallery-info h4 {
+      margin: 0 0 0.25rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .gallery-info p {
+      margin: 0;
+      font-size: 0.75rem;
+      opacity: 0.9;
+    }
+
+    .gallery-stats span {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .upload-area {
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-area:hover,
+    .upload-area.drag-over {
+      border-color: var(--primary);
+      background: rgba(59, 130, 246, 0.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .upload-area h3 {
+      margin: 0 0 0.5rem;
+      color: #1f2937;
+    }
+
+    .upload-area p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .upload-area input {
+      display: none;
+    }
+
+    .upload-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-preview-item {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .upload-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .upload-preview-item button {
+      position: absolute;
+      top: 0.25rem;
+      right: 0.25rem;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .lightbox-close,
+    .lightbox-prev,
+    .lightbox-next {
+      position: absolute;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: none;
+      font-size: 2rem;
+      cursor: pointer;
+      padding: 1rem;
+      border-radius: 50%;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .lightbox-close {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    .lightbox-prev {
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-next {
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-close:hover,
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .lightbox-image-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .lightbox-image-container img {
+      max-width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .lightbox-info {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 12px;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .photo-details h3 {
+      margin: 0 0 0.5rem;
+      font-size: 1.25rem;
+    }
+
+    .photo-details p {
+      margin: 0 0 1rem;
+      opacity: 0.9;
+    }
+
+    .photo-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .photo-actions .action-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: var(--transition);
+    }
+
+    .photo-actions .action-btn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .load-more-container {
+      text-align: center;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .gallery-filters {
+        flex-direction: column;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .gallery-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .lightbox-info {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .photo-actions {
+        justify-content: center;
+      }
+    }
+  </style>
+</body>
+</html>

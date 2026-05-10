@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Traveloop - Destinations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html" class="active">Destinations</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+    </ul>
+  </nav>
+
+
+  <main class="container">
+    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 24px; color: #1f2937; text-align: center;">Discover Amazing Destinations</h1>
+
+    <div class="search-container">
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="Search destinations (e.g., Goa, mountains, beaches)" onkeyup="if(event.key==='Enter')searchDest()" />
+        <button onclick="searchDest()" class="btn">Search</button>
+        <button onclick="clearSearch()" class="btn" style="background: #64748b;">Clear</button>
+      </div>
+      
+      <div class="search-filters">
+        <div class="filter-chip active" data-category="all" onclick="filterByCategory('all')">All Destinations</div>
+        <div class="filter-chip" data-category="beach" onclick="filterByCategory('beach')">🏖️ Beaches</div>
+        <div class="filter-chip" data-category="mountain" onclick="filterByCategory('mountain')">🏔️ Mountains</div>
+        <div class="filter-chip" data-category="cultural" onclick="filterByCategory('cultural')">🏛️ Cultural</div>
+        <div class="filter-chip" data-category="adventure" onclick="filterByCategory('adventure')">🎿 Adventure</div>
+      
+      <div id="search-meta" style="margin-top: 12px; font-size: 0.875rem; color: var(--muted); display: none;">
+        <span id="result-count"></span>
+        <span id="filter-info"></span>
+      </div>
+
+    <div class="cards fade-in" id="dest-cards"></div>
+    
+    <!-- No Results State -->
+    <div id="no-results" style="display: none; text-align: center; padding: 60px 20px;">
+      <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+      <h3 style="color: #1f2937; margin-bottom: 8px;">No destinations found</h3>
+      <p style="color: var(--muted); margin-bottom: 24px;">Try adjusting your search or filter criteria</p>
+      <button onclick="clearSearch()" class="btn">Show All Destinations</button>
+    </div>
+  </main>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year2"></span> Traveloop — Your journey begins here
+      </div>
+  </footer>
+
+
+  <script src="css/js/script.js"></script>
+  <script>
+    // Initialize destinations page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDestinationCards();
+      
+      // Add click handlers to filter chips
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+          const cat = this.getAttribute('data-category');
+          filterByCategory(cat);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+

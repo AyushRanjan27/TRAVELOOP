@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reviews & Ratings - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="reviews-header">
+      <h1>Traveler Reviews</h1>
+      <div class="reviews-stats">
+        <div class="overall-rating">
+          <div class="rating-number">4.6</div>
+          <div class="rating-stars">⭐⭐⭐⭐⭐</div>
+          <div class="rating-count">Based on 1,234 reviews</div>
+        </div>
+        <div class="rating-breakdown">
+          <div class="rating-bar">
+            <span>5 ⭐</span>
+            <div class="bar"><div class="fill" style="width: 70%"></div></div>
+            <span>70%</span>
+          </div>
+          <div class="rating-bar">
+            <span>4 ⭐</span>
+            <div class="bar"><div class="fill" style="width: 20%"></div></div>
+            <span>20%</span>
+          </div>
+          <div class="rating-bar">
+            <span>3 ⭐</span>
+            <div class="bar"><div class="fill" style="width: 7%"></div></div>
+            <span>7%</span>
+          </div>
+          <div class="rating-bar">
+            <span>2 ⭐</span>
+            <div class="bar"><div class="fill" style="width: 2%"></div></div>
+            <span>2%</span>
+          </div>
+          <div class="rating-bar">
+            <span>1 ⭐</span>
+            <div class="bar"><div class="fill" style="width: 1%"></div></div>
+            <span>1%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reviews-actions">
+      <button class="btn" onclick="openReviewModal()">✍️ Write a Review</button>
+      <div class="reviews-filters">
+        <select id="destinationFilter" onchange="filterReviews()">
+          <option value="">All Destinations</option>
+          <option value="goa">Goa</option>
+          <option value="manali">Manali</option>
+          <option value="jaipur">Jaipur</option>
+          <option value="kerala">Kerala</option>
+        </select>
+        <select id="ratingFilter" onchange="filterReviews()">
+          <option value="">All Ratings</option>
+          <option value="5">5 Stars</option>
+          <option value="4">4 Stars</option>
+          <option value="3">3 Stars</option>
+          <option value="2">2 Stars</option>
+          <option value="1">1 Star</option>
+        </select>
+        <select id="sortBy" onchange="sortReviews()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="highest">Highest Rated</option>
+          <option value="lowest">Lowest Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="reviews-list" id="reviewsList"></div>
+
+    <div class="load-more">
+      <button class="btn-secondary" onclick="loadMoreReviews()">Load More Reviews</button>
+    </div>
+  </main>
+
+  <!-- Review Modal -->
+  <div class="modal" id="reviewModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Write a Review</h2>
+        <button class="close-btn" onclick="closeReviewModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="reviewForm" onsubmit="submitReview(event)">
+          <div class="form-group">
+            <label>Destination</label>
+            <select id="reviewDestination" required>
+              <option value="">Select Destination</option>
+              <option value="goa">Goa</option>
+              <option value="manali">Manali</option>
+              <option value="jaipur">Jaipur</option>
+              <option value="kerala">Kerala</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Overall Rating</label>
+            <div class="star-rating" id="starRating">
+              <span class="star" data-rating="1">⭐</span>
+              <span class="star" data-rating="2">⭐</span>
+              <span class="star" data-rating="3">⭐</span>
+              <span class="star" data-rating="4">⭐</span>
+              <span class="star" data-rating="5">⭐</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Review Title</label>
+            <input type="text" id="reviewTitle" placeholder="Summarize your experience" required />
+          </div>
+
+          <div class="form-group">
+            <label>Your Review</label>
+            <textarea id="reviewText" rows="5" placeholder="Share your experience with other travelers..." required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Upload Photos (Optional)</label>
+            <input type="file" id="reviewPhotos" multiple accept="image/*" />
+            <div class="photo-preview" id="photoPreview"></div>
+          </div>
+
+          <div class="rating-categories">
+            <h3>Rate Specific Aspects</h3>
+            <div class="category-ratings">
+              <div class="category-rating">
+                <label>Accommodation</label>
+                <div class="mini-stars" data-category="accommodation">
+                  <span data-rating="1">⭐</span><span data-rating="2">⭐</span><span data-rating="3">⭐</span><span data-rating="4">⭐</span><span data-rating="5">⭐</span>
+                </div>
+              </div>
+              <div class="category-rating">
+                <label>Food</label>
+                <div class="mini-stars" data-category="food">
+                  <span data-rating="1">⭐</span><span data-rating="2">⭐</span><span data-rating="3">⭐</span><span data-rating="4">⭐</span><span data-rating="5">⭐</span>
+                </div>
+              </div>
+              <div class="category-rating">
+                <label>Transportation</label>
+                <div class="mini-stars" data-category="transport">
+                  <span data-rating="1">⭐</span><span data-rating="2">⭐</span><span data-rating="3">⭐</span><span data-rating="4">⭐</span><span data-rating="5">⭐</span>
+                </div>
+              </div>
+              <div class="category-rating">
+                <label>Activities</label>
+                <div class="mini-stars" data-category="activities">
+                  <span data-rating="1">⭐</span><span data-rating="2">⭐</span><span data-rating="3">⭐</span><span data-rating="4">⭐</span><span data-rating="5">⭐</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="closeReviewModal()">Cancel</button>
+            <button type="submit" class="btn">Submit Review</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let reviews = [
+      {
+        id: 1,
+        user: 'Sarah Johnson',
+        avatar: 'SJ',
+        destination: 'goa',
+        rating: 5,
+        title: 'Amazing Beach Paradise!',
+        text: 'Goa exceeded all my expectations! The beaches were pristine, food was incredible, and the nightlife was vibrant. Perfect for both relaxation and adventure.',
+        date: '2024-01-10',
+        helpful: 24,
+        photos: ['beach1.jpg', 'sunset.jpg'],
+        categories: { accommodation: 5, food: 5, transport: 4, activities: 5 }
+      },
+      {
+        id: 2,
+        user: 'Mike Chen',
+        avatar: 'MC',
+        destination: 'manali',
+        rating: 4,
+        title: 'Great Mountain Getaway',
+        text: 'Beautiful mountain scenery and great adventure activities. The weather was perfect and the local culture was fascinating.',
+        date: '2024-01-08',
+        helpful: 18,
+        photos: ['mountain1.jpg'],
+        categories: { accommodation: 4, food: 4, transport: 3, activities: 5 }
+      }
+    ];
+
+    let selectedRating = 0;
+    let categoryRatings = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadReviews();
+      setupStarRatings();
+    });
+
+    function loadReviews() {
+      const container = document.getElementById('reviewsList');
+      container.innerHTML = reviews.map(review => `
+        <div class="review-card">
+          <div class="review-header">
+            <div class="reviewer-info">
+              <div class="reviewer-avatar">${review.avatar}</div>
+              <div class="reviewer-details">
+                <h4>${review.user}</h4>
+                <div class="review-meta">
+                  <span class="destination-tag">${review.destination.toUpperCase()}</span>
+                  <span class="review-date">${formatDate(review.date)}</span>
+                </div>
+              </div>
+            </div>
+            <div class="review-rating">
+              <div class="stars">${'⭐'.repeat(review.rating)}</div>
+              <div class="rating-number">${review.rating}/5</div>
+            </div>
+          </div>
+          
+          <div class="review-content">
+            <h3>${review.title}</h3>
+            <p>${review.text}</p>
+            
+            ${review.photos ? `
+              <div class="review-photos">
+                ${review.photos.map(photo => `<img src="https://via.placeholder.com/150x100?text=Photo" alt="Review photo" />`).join('')}
+              </div>
+            ` : ''}
+            
+            <div class="category-ratings-display">
+              <div class="category-item">
+                <span>🏨 Accommodation</span>
+                <span>${'⭐'.repeat(review.categories.accommodation)}</span>
+              </div>
+              <div class="category-item">
+                <span>🍽️ Food</span>
+                <span>${'⭐'.repeat(review.categories.food)}</span>
+              </div>
+              <div class="category-item">
+                <span>🚗 Transport</span>
+                <span>${'⭐'.repeat(review.categories.transport)}</span>
+              </div>
+              <div class="category-item">
+                <span>🎯 Activities</span>
+                <span>${'⭐'.repeat(review.categories.activities)}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="review-actions">
+            <button class="helpful-btn" onclick="markHelpful(${review.id})">
+              👍 Helpful (${review.helpful})
+            </button>
+            <button class="reply-btn" onclick="replyToReview(${review.id})">
+              💬 Reply
+            </button>
+            <button class="share-btn" onclick="shareReview(${review.id})">
+              📤 Share
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupStarRatings() {
+      // Main rating
+      document.querySelectorAll('#starRating .star').forEach(star => {
+        star.addEventListener('click', (e) => {
+          selectedRating = parseInt(e.target.dataset.rating);
+          updateStarDisplay('#starRating', selectedRating);
+        });
+      });
+
+      // Category ratings
+      document.querySelectorAll('.mini-stars').forEach(container => {
+        const category = container.dataset.category;
+        container.querySelectorAll('span').forEach(star => {
+          star.addEventListener('click', (e) => {
+            const rating = parseInt(e.target.dataset.rating);
+            categoryRatings[category] = rating;
+            updateStarDisplay(`[data-category="${category}"]`, rating);
+          });
+        });
+      });
+    }
+
+    function updateStarDisplay(selector, rating) {
+      const container = document.querySelector(selector);
+      container.querySelectorAll('span').forEach((star, index) => {
+        star.style.opacity = index < rating ? '1' : '0.3';
+      });
+    }
+
+    function openReviewModal() {
+      document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function closeReviewModal() {
+      document.getElementById('reviewModal').style.display = 'none';
+      document.getElementById('reviewForm').reset();
+      selectedRating = 0;
+      categoryRatings = {};
+    }
+
+    function submitReview(event) {
+      event.preventDefault();
+      
+      if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+
+      const newReview = {
+        id: reviews.length + 1,
+        user: getCurrentUser()?.firstName + ' ' + getCurrentUser()?.lastName || 'Anonymous',
+        avatar: (getCurrentUser()?.firstName?.[0] || 'A') + (getCurrentUser()?.lastName?.[0] || 'U'),
+        destination: document.getElementById('reviewDestination').value,
+        rating: selectedRating,
+        title: document.getElementById('reviewTitle').value,
+        text: document.getElementById('reviewText').value,
+        date: new Date().toISOString().split('T')[0],
+        helpful: 0,
+        categories: categoryRatings
+      };
+
+      reviews.unshift(newReview);
+      loadReviews();
+      closeReviewModal();
+      alert('Review submitted successfully! 🎉');
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    }
+
+    function markHelpful(reviewId) {
+      const review = reviews.find(r => r.id === reviewId);
+      if (review) {
+        review.helpful++;
+        loadReviews();
+      }
+    }
+
+    function filterReviews() {
+      // Filter implementation
+      loadReviews();
+    }
+
+    function sortReviews() {
+      // Sort implementation
+      loadReviews();
+    }
+
+    function loadMoreReviews() {
+      alert('Loading more reviews...');
+    }
+  </script>
+</body>
+</html>

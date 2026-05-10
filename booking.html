@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book Your Trip - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="booking-container">
+      <div class="booking-progress">
+        <div class="step active" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-label">Trip Details</div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-label">Travelers</div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-label">Preferences</div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-label">Payment</div>
+        </div>
+      </div>
+
+      <div class="booking-content">
+        <!-- Step 1: Trip Details -->
+        <div class="booking-step active" id="step1">
+          <h2>Plan Your Perfect Trip</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Destination</label>
+              <select id="destination" onchange="updatePricing()">
+                <option value="">Select Destination</option>
+                <option value="goa">Goa - ₹3,000/day</option>
+                <option value="manali">Manali - ₹2,500/day</option>
+                <option value="jaipur">Jaipur - ₹2,000/day</option>
+                <option value="kerala">Kerala - ₹3,500/day</option>
+                <option value="agra">Agra - ₹2,000/day</option>
+                <option value="kashmir">Kashmir - ₹3,000/day</option>
+                <option value="ladakh">Ladakh - ₹4,000/day</option>
+                <option value="andaman">Andaman - ₹4,500/day</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Check-in Date</label>
+              <input type="date" id="checkin" onchange="updatePricing()" />
+            </div>
+            <div class="form-group">
+              <label>Check-out Date</label>
+              <input type="date" id="checkout" onchange="updatePricing()" />
+            </div>
+            <div class="form-group">
+              <label>Number of Travelers</label>
+              <div class="number-input">
+                <button type="button" onclick="updateTravelers(-1)">-</button>
+                <input type="number" id="travelers" value="2" min="1" max="20" onchange="updatePricing()" />
+                <button type="button" onclick="updateTravelers(1)">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="pricing-summary" id="pricingSummary"></div>
+        </div>
+
+        <!-- Step 2: Travelers -->
+        <div class="booking-step" id="step2">
+          <h2>Traveler Information</h2>
+          <div id="travelersForm"></div>
+        </div>
+
+        <!-- Step 3: Preferences -->
+        <div class="booking-step" id="step3">
+          <h2>Travel Preferences</h2>
+          <div class="preferences-grid">
+            <div class="preference-group">
+              <h3>Accommodation Type</h3>
+              <div class="radio-group">
+                <label><input type="radio" name="accommodation" value="hotel" checked /> Hotel</label>
+                <label><input type="radio" name="accommodation" value="resort" /> Resort</label>
+                <label><input type="radio" name="accommodation" value="homestay" /> Homestay</label>
+              </div>
+            </div>
+            <div class="preference-group">
+              <h3>Meal Plan</h3>
+              <div class="radio-group">
+                <label><input type="radio" name="meals" value="none" /> No Meals</label>
+                <label><input type="radio" name="meals" value="breakfast" checked /> Breakfast Only</label>
+                <label><input type="radio" name="meals" value="full" /> Full Board</label>
+              </div>
+            </div>
+            <div class="preference-group">
+              <h3>Transportation</h3>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="transport" value="flight" /> Flight Booking</label>
+                <label><input type="checkbox" name="transport" value="cab" /> Airport Transfer</label>
+                <label><input type="checkbox" name="transport" value="local" /> Local Transport</label>
+              </div>
+            </div>
+            <div class="preference-group">
+              <h3>Activities</h3>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="activities" value="sightseeing" /> Sightseeing Tours</label>
+                <label><input type="checkbox" name="activities" value="adventure" /> Adventure Sports</label>
+                <label><input type="checkbox" name="activities" value="cultural" /> Cultural Experiences</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Payment -->
+        <div class="booking-step" id="step4">
+          <h2>Payment Details</h2>
+          <div class="payment-container">
+            <div class="booking-summary">
+              <h3>Booking Summary</h3>
+              <div id="finalSummary"></div>
+            </div>
+            <div class="payment-form">
+              <div class="payment-methods">
+                <label class="payment-method active">
+                  <input type="radio" name="payment" value="card" checked />
+                  <span>💳 Credit/Debit Card</span>
+                </label>
+                <label class="payment-method">
+                  <input type="radio" name="payment" value="upi" />
+                  <span>📱 UPI</span>
+                </label>
+                <label class="payment-method">
+                  <input type="radio" name="payment" value="wallet" />
+                  <span>👛 Wallet</span>
+                </label>
+              </div>
+              <div class="card-form" id="cardForm">
+                <div class="form-group">
+                  <label>Card Number</label>
+                  <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" />
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="text" placeholder="MM/YY" maxlength="5" />
+                  </div>
+                  <div class="form-group">
+                    <label>CVV</label>
+                    <input type="text" placeholder="123" maxlength="3" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label>Cardholder Name</label>
+                  <input type="text" placeholder="John Doe" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button class="btn-secondary" id="prevBtn" onclick="previousStep()" style="display: none;">Previous</button>
+        <button class="btn" id="nextBtn" onclick="nextStep()">Next Step</button>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentStep = 1;
+    let bookingData = {};
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updatePricing();
+      generateTravelersForm();
+      
+      // Check if destination was selected from home page
+      const selectedDestination = localStorage.getItem('selected_destination');
+      if (selectedDestination) {
+        const destinationSelect = document.getElementById('destination');
+        if (destinationSelect) {
+          destinationSelect.value = selectedDestination;
+          updatePricing();
+        }
+        localStorage.removeItem('selected_destination');
+      }
+    });
+
+    function nextStep() {
+      if (validateStep(currentStep)) {
+        if (currentStep < 4) {
+          currentStep++;
+          updateStepDisplay();
+        } else {
+          processBooking();
+        }
+      }
+    }
+
+    function previousStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    }
+
+    function updateStepDisplay() {
+      document.querySelectorAll('.step').forEach((step, index) => {
+        step.classList.toggle('active', index + 1 <= currentStep);
+      });
+
+      document.querySelectorAll('.booking-step').forEach((step, index) => {
+        step.classList.toggle('active', index + 1 === currentStep);
+      });
+
+      document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').textContent = currentStep === 4 ? 'Complete Booking' : 'Next Step';
+    }
+
+    function validateStep(step) {
+      switch(step) {
+        case 1:
+          return document.getElementById('destination').value && 
+                 document.getElementById('checkin').value && 
+                 document.getElementById('checkout').value;
+        case 2:
+          return true; // Travelers form validation
+        case 3:
+          return true; // Preferences validation
+        case 4:
+          return true; // Payment validation
+      }
+    }
+
+    function updateTravelers(delta) {
+      const input = document.getElementById('travelers');
+      const newValue = Math.max(1, Math.min(20, parseInt(input.value) + delta));
+      input.value = newValue;
+      updatePricing();
+      generateTravelersForm();
+    }
+
+    function generateTravelersForm() {
+      const count = parseInt(document.getElementById('travelers').value);
+      const container = document.getElementById('travelersForm');
+      
+      let html = '';
+      for (let i = 1; i <= count; i++) {
+        html += `
+          <div class="traveler-form">
+            <h4>Traveler ${i}</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" required />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Age</label>
+                <input type="number" min="1" max="100" required />
+              </div>
+              <div class="form-group">
+                <label>Gender</label>
+                <select required>
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function updatePricing() {
+      const destination = document.getElementById('destination').value;
+      const checkin = document.getElementById('checkin').value;
+      const checkout = document.getElementById('checkout').value;
+      const travelers = parseInt(document.getElementById('travelers').value);
+
+      if (!destination || !checkin || !checkout) return;
+
+      const prices = {
+        goa: 3000, manali: 2500, jaipur: 2000, kerala: 3500,
+        agra: 2000, kashmir: 3000, ladakh: 4000, andaman: 4500
+      };
+
+      const days = Math.ceil((new Date(checkout) - new Date(checkin)) / (1000 * 60 * 60 * 24));
+      const basePrice = prices[destination] * days * travelers;
+      const taxes = basePrice * 0.18;
+      const total = basePrice + taxes;
+
+      document.getElementById('pricingSummary').innerHTML = `
+        <div class="pricing-card">
+          <h3>Price Breakdown</h3>
+          <div class="price-item">
+            <span>Base Price (${days} days × ${travelers} travelers)</span>
+            <span>₹${basePrice.toLocaleString()}</span>
+          </div>
+          <div class="price-item">
+            <span>Taxes & Fees (18%)</span>
+            <span>₹${taxes.toLocaleString()}</span>
+          </div>
+          <div class="price-total">
+            <span>Total Amount</span>
+            <span>₹${total.toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function processBooking() {
+      alert('Booking Successful! 🎉\n\nYour trip has been booked successfully. You will receive a confirmation email shortly.');
+      window.location.href = 'profile.html';
+    }
+  </script>
+</body>
+</html>

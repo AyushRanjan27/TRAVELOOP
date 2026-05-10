@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Traveloop - Home</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+
+    <nav class="nav container">
+      <div class="brand">Traveloop</div>
+      <ul class="nav-links" id="mainNavLinks">
+        <!-- Navigation will be updated by JavaScript based on login state -->
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="login.html">Sign In</a></li>
+        <li><a href="signup.html">Sign Up</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero container">
+      <div class="hero-left">
+        <h1>Explore the world with Traveloop</h1>
+        <p>Discover amazing places, plan your trip, and create memories.</p>
+        <a class="btn" href="destinations.html">Explore Destinations</a>
+      </div>
+      <div class="hero-right">
+        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80&auto=format&fit=crop" alt="travel" />
+      </div>
+    </section>
+  </header>
+
+
+  <main class="container">
+
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Popular Destinations</h2>
+      <div class="cards fade-in" id="home-cards">
+        <!-- Cards injected by script.js or paste static cards here -->
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Plan Your Journey</h2>
+      <div class="travel-planner" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 16px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h3 style="font-size: 1.5rem; margin-bottom: 8px;">Find Your Perfect Trip</h3>
+          <p style="opacity: 0.9;">Select your destination and transportation method to get instant pricing</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;">
+          <div class="planner-step">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">🎯 Choose Your Destination</label>
+            <select id="destinationSelect" onchange="updateTravelPrice()" style="width: 100%; padding: 12px 16px; border: none; border-radius: 8px; font-size: 1rem; background: white; color: #333;">
+              <option value="">Select a destination...</option>
+              <!-- Options will be populated by JavaScript -->
+            </select>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 24px;">
+          <button class="btn" onclick="planDetailedTrip()" style="background: white; color: #667eea; font-weight: 600; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer;">
+            🎯 Plan Your Trip
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Why Choose Traveloop?</h2>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">🧭</div>
+          <h3>Discover faster</h3>
+          <p>Search and browse destinations by category and state—so you find the right place quickly.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🗺️</div>
+          <h3>Plan with confidence</h3>
+          <p>Use the trip planner on destination details to shape an itinerary and estimate costs.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">💡</div>
+          <h3>Smoother experience</h3>
+          <p>Clean cards, filters, and helpful empty states make browsing and planning easy on every device.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔒</div>
+          <h3>Personal & reliable</h3>
+          <p>Sign in for favorites/trips (when enabled) and still works with fallback data for static hosting.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Recent Reviews</h2>
+      <div class="reviews-preview" id="reviewsPreview">
+        <!-- Reviews will be loaded here -->
+      </div>
+      <div style="text-align: center; margin-top: 24px;">
+        <a class="btn-secondary" href="reviews.html">View All Reviews</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Travel Gallery</h2>
+      <div class="gallery-preview" id="galleryPreview">
+        <!-- Gallery preview will be loaded here -->
+      </div>
+      <div style="text-align: center; margin-top: 24px;">
+        <a class="btn-secondary" href="gallery.html">Explore Gallery</a>
+      </div>
+    </section>
+    <section class="section">
+      <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 24px; color: #1f2937;">Get In Touch</h2>
+      <div class="contact-info">
+        <h3>Have questions or need help planning your trip?</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin: 16px 0;">
+          <div class="contact-item">
+            <div class="icon">📧</div>
+            <div>
+              <strong>Email</strong><br>
+              support@Traveloop.com
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">📱</div>
+            <div>
+              <strong>Phone</strong><br>
+              +91 9835690836
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="icon">💬</div>
+            <div>
+              <strong>Live Chat</strong><br>
+              Available 24/7
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 16px;">
+          <a class="btn" href="contact.html">Send a Message</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year"></span> Traveloop — Built for your amazing journeys
+      </div>
+    </div>
+  </footer>
+
+
+  <script>
+    renderHomeCards();
+    
+    // Populate destination dropdown on home page
+    document.addEventListener('DOMContentLoaded', () => {
+      const destinationSelect = document.getElementById('destinationSelect');
+      if (destinationSelect) {
+        // Add all main destinations
+        DESTINATIONS.forEach(dest => {
+          const option = document.createElement('option');
+          option.value = dest.id;
+          option.textContent = `${dest.name} - ₹${dest.price.toLocaleString()}/day`;
+          destinationSelect.appendChild(option);
+        });
+        
+        // Add category destinations
+        Object.keys(DESTINATION_CATEGORIES).forEach(categoryKey => {
+          const category = DESTINATION_CATEGORIES[categoryKey];
+          category.destinations.forEach(dest => {
+            const option = document.createElement('option');
+            option.value = dest.id;
+            option.textContent = `${dest.name} - ${dest.state}`;
+            destinationSelect.appendChild(option);
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
+

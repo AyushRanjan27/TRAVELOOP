@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Traveloop - Destinations</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html" class="active">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+
+  <main class="container">
+    <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 24px; color: #1f2937; text-align: center;">Discover Amazing Destinations</h1>
+
+    <div class="search-container">
+      <div class="search-row">
+        <input id="searchInput" type="text" placeholder="Search destinations (e.g., Goa, mountains, beaches)" onkeyup="if(event.key==='Enter')handleSearch()" />
+        <button onclick="handleSearch()" class="btn">Search</button>
+        <button onclick="clearSearch()" class="btn" style="background: #64748b;">Clear</button>
+      </div>
+      
+      <div class="search-filters">
+        <div class="filter-chip active" data-category="all" onclick="handleFilter('all')">All Destinations</div>
+        <div class="filter-chip" data-category="beach" onclick="showCategoryDestinations('beaches')">🏖️ Beaches</div>
+        <div class="filter-chip" data-category="mountain" onclick="showCategoryDestinations('mountains')">🏔️ Mountains</div>
+        <div class="filter-chip" data-category="cultural" onclick="showCategoryDestinations('cultural')">🏛️ Cultural</div>
+        <div class="filter-chip" data-category="adventure" onclick="showCategoryDestinations('adventure')">🎿 Adventure</div>
+        <div class="filter-chip" data-category="states" onclick="showAllStates()">🗺️ All States</div>
+      </div>
+      
+      <div id="search-meta" style="margin-top: 12px; font-size: 0.875rem; color: var(--muted); display: none;">
+        <span id="result-count"></span>
+        <span id="filter-info"></span>
+      </div>
+    </div>
+
+    <div class="cards fade-in" id="dest-cards"></div>
+    
+    <!-- No Results State -->
+    <div id="no-results" style="display: none; text-align: center; padding: 60px 20px;">
+      <div style="font-size: 4rem; margin-bottom: 16px;">🔍</div>
+      <h3 style="color: #1f2937; margin-bottom: 8px;">No destinations found</h3>
+      <p style="color: var(--muted); margin-bottom: 24px;">Try adjusting your search or filter criteria</p>
+      <button onclick="clearSearch()" class="btn">Show All Destinations</button>
+    </div>
+  </main>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year2"></span> Traveloop — Your journey begins here
+      </div>
+    </div>
+  </footer>
+
+
+  <script>
+    let currentSearchQuery = '';
+    
+    // Handle search with meta info display
+    function handleSearch() {
+      currentSearchQuery = document.getElementById('searchInput').value?.toLowerCase() || '';
+      
+      // Check if searching for a state
+      const matchedState = ALL_STATES.find(state => 
+        state.name.toLowerCase().includes(currentSearchQuery) || 
+        state.destinations.some(dest => dest.toLowerCase().includes(currentSearchQuery))
+      );
+      
+      if (matchedState && currentSearchQuery) {
+        // Show state with all tourist places
+        const container = document.getElementById('dest-cards');
+        const stateHTML = `
+          <div class="card slide-up">
+            <div class="card-body">
+              <h3 style="color: #1f2937; margin-bottom: 8px;">${matchedState.name}</h3>
+              <p style="color: var(--muted); margin-bottom: 12px;">Tourist Places:</p>
+              <div class="state-destinations" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                ${matchedState.destinations.map(dest => `<span style="background: #3b82f6; color: white; padding: 6px 12px; border-radius: 16px; font-size: 0.875rem;">${dest}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        container.innerHTML = stateHTML;
+        document.getElementById('no-results').style.display = 'none';
+        document.getElementById('search-meta').style.display = 'flex';
+        document.getElementById('result-count').textContent = `Found ${matchedState.destinations.length} places in ${matchedState.name}`;
+        document.getElementById('filter-info').textContent = '';
+        return;
+      }
+      
+      performSearchAndFilter();
+    }
+    
+    // Handle category filter
+    function handleFilter(category) {
+      currentFilter = category;
+      document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+      document.querySelector(`[data-category="${category}"]`)?.classList.add('active');
+      
+      if (category === 'all') {
+        renderCards(document.getElementById('dest-cards'), DESTINATIONS);
+        document.getElementById('search-meta').style.display = 'none';
+        document.getElementById('no-results').style.display = 'none';
+      } else {
+        performSearchAndFilter();
+      }
+    }
+    
+    // Combined search and filter function
+    function performSearchAndFilter() {
+      const container = document.getElementById('dest-cards');
+      const noResults = document.getElementById('no-results');
+      const searchMeta = document.getElementById('search-meta');
+      
+      let filtered = DESTINATIONS;
+      
+      // Apply category filter
+      if (currentFilter !== 'all') {
+        filtered = filtered.filter(d => d.category === currentFilter);
+      }
+      
+      // Apply search filter
+      if (currentSearchQuery) {
+        filtered = filtered.filter(d => 
+          d.name.toLowerCase().includes(currentSearchQuery) || 
+          d.short.toLowerCase().includes(currentSearchQuery) ||
+          d.category.toLowerCase().includes(currentSearchQuery)
+        );
+      }
+      
+      renderCards(container, filtered);
+      
+      // Show/hide meta info
+      if (currentSearchQuery || currentFilter !== 'all') {
+        searchMeta.style.display = 'flex';
+        searchMeta.style.gap = '12px';
+        searchMeta.style.alignItems = 'center';
+        document.getElementById('result-count').textContent = `${filtered.length} destination${filtered.length !== 1 ? 's' : ''} found`;
+        
+        let filterText = '';
+        if (currentFilter !== 'all') {
+          const catNames = { beach: 'Beaches', mountain: 'Mountains', cultural: 'Cultural', adventure: 'Adventure' };
+          filterText = ` in ${catNames[currentFilter] || currentFilter}`;
+        }
+        document.getElementById('filter-info').textContent = filterText;
+      } else {
+        searchMeta.style.display = 'none';
+      }
+      
+      // Show/hide no results
+      if (filtered.length === 0) {
+        container.style.display = 'none';
+        noResults.style.display = 'block';
+      } else {
+        container.style.display = 'grid';
+        noResults.style.display = 'none';
+      }
+    }
+    
+    // Clear search and filters
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      currentSearchQuery = '';
+      document.getElementById('dest-cards').style.display = 'grid';
+      document.getElementById('no-results').style.display = 'none';
+      document.getElementById('search-meta').style.display = 'none';
+      currentFilter = 'all';
+      document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+      document.querySelector('[data-category="all"]').classList.add('active');
+      renderCards(document.getElementById('dest-cards'), DESTINATIONS);
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCards(document.getElementById('dest-cards'), DESTINATIONS);
+    });
+    
+    // Show all states function
+    function showAllStates() {
+      const container = document.getElementById('dest-cards');
+      document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+      document.querySelector('[data-category="states"]').classList.add('active');
+      
+      const statesHTML = ALL_STATES.map(state => `
+        <div class="card slide-up">
+          <div class="card-body">
+            <h3 style="color: #1f2937; margin-bottom: 8px;">${state.name}</h3>
+            <div class="state-destinations">
+              ${state.destinations.map(dest => `<span class="destination-tag">${dest}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = statesHTML;
+      document.getElementById('no-results').style.display = 'none';
+      document.getElementById('search-meta').style.display = 'flex';
+      document.getElementById('result-count').textContent = `${ALL_STATES.length} states & territories`;
+      document.getElementById('filter-info').textContent = '';
+    }
+    
+    // Export functions to global scope
+    window.showAllStates = showAllStates;
+    window.handleSearch = handleSearch;
+    window.handleFilter = handleFilter;
+    window.clearSearch = clearSearch;
+  </script>
+</body>
+</html>
+

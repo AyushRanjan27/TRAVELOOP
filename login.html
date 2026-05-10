@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html" class="active">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="login-header">
+
+  <div class="login-profile-container">
+    <div class="login-profile-circle">
+      <img id="loginProfileImage" src="https://via.placeholder.com/150" alt="Profile Photo">
+    </div>
+  </div>
+
+</div>
+
+        <form id="loginForm" class="login-form">
+          <div class="form-group">
+            <label for="email">Email or Username</label>
+            <input 
+              type="text" 
+              id="email" 
+              name="email" 
+              placeholder="Enter your email or username" 
+              required 
+              autocomplete="username"
+            />
+            <span class="error-message" id="emailError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="password-container">
+              <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="Enter your password" 
+                required 
+                autocomplete="current-password"
+              />
+              <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                👁️
+              </button>
+            </div>
+            <span class="error-message" id="passwordError"></span>
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-container">
+              <input type="checkbox" id="rememberMe" name="rememberMe" />
+              <span class="checkmark"></span>
+              Remember me
+            </label>
+            <a href="#" class="forgot-password" onclick="showForgotPassword()">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn login-btn" id="loginBtn">
+            <span class="btn-text">Sign In</span>
+            <span class="loading-spinner hidden">🔄</span>
+          </button>
+        </form>
+
+        <div class="login-footer">
+          <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+        </div>
+
+        <div id="loginAlert" class="alert hidden"></div>
+      </div>
+
+      <div class="login-benefits">
+        <h3>Why join Traveloop?</h3>
+        <ul class="benefits-list">
+          <li> Save your favorite destinations</li>
+          <li> Plan and track your trips</li>
+          <li> Get personalized travel recommendations</li>
+          <li> Access your travel history anywhere</li>
+          <li> Receive travel deal notifications</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year"></span> Traveloop — Your journey begins here
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      if (isLoggedIn()) {
+        window.location.href = 'index.html';
+      }
+      
+      // Initialize login form
+      initializeLoginForm();
+    });
+
+    function initializeLoginForm() {
+      const loginForm = document.getElementById('loginForm');
+      const loginBtn = document.getElementById('loginBtn');
+      
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await handleLogin();
+      });
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const rememberMe = document.getElementById('rememberMe').checked;
+      
+      // Clear previous errors
+      clearErrors();
+      
+      // Validate inputs
+      if (!email) {
+        showError('email', 'Email or username is required');
+        return;
+      }
+      
+      if (!password) {
+        showError('password', 'Password is required');
+        return;
+      }
+      
+      // Show loading state
+      const loginBtn = document.getElementById('loginBtn');
+      const btnText = loginBtn.querySelector('.btn-text');
+      const spinner = loginBtn.querySelector('.loading-spinner');
+      
+      btnText.textContent = 'Signing In...';
+      spinner.classList.remove('hidden');
+      loginBtn.disabled = true;
+      
+      try {
+        const result = await loginUser(email, password);
+        
+        if (result.success) {
+          // Store remember me preference
+          if (rememberMe) {
+            localStorage.setItem('Traveloop_remember_me', 'true');
+          } else {
+            localStorage.removeItem('Traveloop_remember_me');
+          }
+          
+          showAlert('Login successful! Redirecting...', 'success');
+          
+          // Redirect after short delay
+          setTimeout(() => {
+            const redirectTo = getUrlParameter('redirect') || 'index.html';
+            window.location.href = redirectTo;
+          }, 1000);
+        } else {
+          showError('email', result.message || 'Invalid credentials');
+          showAlert(result.message || 'Login failed. Please check your credentials.', 'error');
+        }
+      } catch (error) {
+        showAlert('An error occurred. Please try again.', 'error');
+        console.error('Login error:', error);
+      } finally {
+        // Reset button state
+        btnText.textContent = 'Sign In';
+        spinner.classList.add('hidden');
+        loginBtn.disabled = false;
+      }
+    }
+
+    function togglePassword(fieldId) {
+      const passwordField = document.getElementById(fieldId);
+      const toggleBtn = passwordField.nextElementSibling;
+      
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleBtn.textContent = '🙈';
+      } else {
+        passwordField.type = 'password';
+        toggleBtn.textContent = '👁️';
+      }
+    }
+
+    function showForgotPassword() {
+      const email = document.getElementById('email').value.trim();
+      let message = 'Password reset feature coming soon!\n\n';
+      
+      if (email) {
+        message += `If you forgot your password for ${email}, please contact our support team.`;
+      } else {
+        message += 'Please enter your email address first, then try again.';
+      }
+      
+      alert(message);
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.error-message').forEach(error => {
+        error.textContent = '';
+      });
+    }
+
+    function showError(fieldName, message) {
+      const errorElement = document.getElementById(fieldName + 'Error');
+      if (errorElement) {
+        errorElement.textContent = message;
+      }
+    }
+
+    function showAlert(message, type = 'info') {
+      const alertElement = document.getElementById('loginAlert');
+      alertElement.textContent = message;
+      alertElement.className = `alert ${type}`;
+      alertElement.classList.remove('hidden');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        alertElement.classList.add('hidden');
+      }, 5000);
+    }
+
+    function getUrlParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+  </script>
+</body>
+</html>
+

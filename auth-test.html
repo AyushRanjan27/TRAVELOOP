@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Auth Test - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .test-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+    .test-card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(14, 165, 233, 0.15);
+      margin-bottom: 20px;
+    }
+    .test-result {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .test-result.success {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #059669;
+    }
+    .test-result.error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #dc2626;
+    }
+    .test-result.info {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: #2563eb;
+    }
+    .test-section {
+      margin-bottom: 20px;
+    }
+    .test-section h3 {
+      margin-bottom: 15px;
+      color: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div class="test-card">
+      <h1 style="margin: 0 0 10px; font-size: 1.75rem;">Authentication System Test</h1>
+      <p style="color: var(--muted); margin-bottom: 30px;">Testing client-side authentication with localStorage</p>
+      
+      <div id="test-results"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <div class="copyright">
+        © <span id="year"></span> Traveloop — Your journey begins here
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('year').textContent = new Date().getFullYear();
+      updateNavigation();
+      
+      const results = document.getElementById('test-results');
+      results.innerHTML = '<div style="text-align:center;padding:20px;">Running tests...</div>';
+      
+      // Wait a bit for script to load
+      await new Promise(r => setTimeout(r, 100));
+      
+      const tests = [];
+      
+      // Test 1: Check if functions exist
+      tests.push({
+        name: 'Authentication Functions',
+        test: () => {
+          return typeof registerUser === 'function' && 
+                 typeof loginUser === 'function' && 
+                 typeof logoutUser === 'function' && 
+                 typeof isLoggedIn === 'function' &&
+                 typeof getCurrentUser === 'function';
+        },
+        message: 'All authentication functions are available'
+      });
+      
+      // Test 2: Register a test user
+      tests.push({
+        name: 'User Registration',
+        test: async () => {
+          const testUser = {
+            firstName: 'Test',
+            lastName: 'User',
+            email: 'test@Traveloop.com',
+            username: 'testuser',
+            password: 'Test@123',
+            newsletter: false
+          };
+          
+          // Clear existing test user if any
+          const users = getStoredUsers ? getStoredUsers() : [];
+          const filtered = users.filter(u => u.email !== 'test@Traveloop.com');
+          localStorage.setItem('Traveloop_users', JSON.stringify(filtered));
+          
+          const result = await registerUser(testUser);
+          return result.success;
+        },
+        message: 'User registration successful'
+      });
+      
+      // Test 3: Login with test user
+      tests.push({
+        name: 'User Login',
+        test: async () => {
+          const result = await loginUser('test@Traveloop.com', 'Test@123');
+          return result.success && isLoggedIn();
+        },
+        message: 'Login successful - user is now authenticated'
+      });
+      
+      // Test 4: Check user session
+      tests.push({
+        name: 'Session Management',
+        test: () => {
+          const user = getCurrentUser();
+          return user && user.email === 'test@Traveloop.com';
+        },
+        message: 'Session is active and user data is correct'
+      });
+      
+      // Test 5: Logout
+      tests.push({
+        name: 'User Logout',
+        test: () => {
+          logoutUser();
+          return !isLoggedIn();
+        },
+        message: 'Logout successful - session cleared'
+      });
+      
+      // Run tests
+      let html = '';
+      for (const t of tests) {
+        try {
+          const passed = await t.test();
+          html += `
+            <div class="test-section">
+              <h3>${t.name}</h3>
+              <div class="test-result ${passed ? 'success' : 'error'}">
+                ${passed ? '✓' : '✗'} ${t.message}
+              </div>
+            </div>
+          `;
+        } catch (e) {
+          html += `
+            <div class="test-section">
+              <h3>${t.name}</h3>
+              <div class="test-result error">
+                ✗ Error: ${e.message}
+              </div>
+            </div>
+          `;
+        }
+      }
+      
+      results.innerHTML = html;
+      
+      // Add navigation link
+      results.innerHTML += `
+        <div class="test-result info" style="margin-top: 20px;">
+          <strong>Next Steps:</strong><br>
+          <a href="login.html" class="btn" style="margin-top: 10px; display: inline-block;">Go to Login Page</a>
+          <a href="signup.html" class="btn" style="margin-top: 10px; margin-left: 10px; display: inline-block;">Go to Signup Page</a>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
+

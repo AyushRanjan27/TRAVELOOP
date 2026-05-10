@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile - Traveloop</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <!-- Navigation will be updated by JavaScript based on login state -->
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div id="profileContent">
+      <!-- Profile content will be loaded by JavaScript -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year"></span> Traveloop — Your journey begins here
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Update year
+      document.getElementById('year').textContent = new Date().getFullYear();
+      
+      // Update navigation
+      updateNavigation();
+      
+      // Check if user is logged in
+      if (!isLoggedIn()) {
+        window.location.href = 'login.html?redirect=' + encodeURIComponent('profile.html');
+        return;
+      }
+      
+      loadProfilePage();
+    });
+
+    function loadProfilePage() {
+      const currentUser = getCurrentUser();
+      const contentDiv = document.getElementById('profileContent');
+      
+      if (!currentUser) {
+        contentDiv.innerHTML = `
+          <div class="profile-error">
+            <h2>Profile Not Found</h2>
+            <p>We couldn't load your profile information. Please try signing in again.</p>
+            <a href="login.html" class="btn">Sign In</a>
+          </div>
+        `;
+        return;
+      }
+
+      // Build profile name from firstName and lastName
+      const fullName = `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.username;
+      
+      // Get user data from localStorage
+      const favorites = JSON.parse(localStorage.getItem('Traveloop_favorites') || '[]');
+      const trips = JSON.parse(localStorage.getItem('Traveloop_trips') || '[]');
+      const contacts = JSON.parse(localStorage.getItem('Traveloop_contacts') || '[]');
+      
+      const favoriteCount = favorites.length;
+      const tripsCount = trips.length;
+      const contactsCount = contacts.length;
+      const memberSince = currentUser.createdAt ? new Date(currentUser.createdAt).toLocaleDateString() : 'Recently';
+      const lastLogin = currentUser.lastLogin ? new Date(currentUser.lastLogin).toLocaleDateString() : 'This session';
+
+      contentDiv.innerHTML = `
+        <div class="profile-container">
+          <div class="profile-header">
+            <div class="profile-avatar">
+              ${getUserInitials(fullName)}
+            </div>
+            <div class="profile-info">
+              <h1>${fullName}</h1>
+              <p class="profile-email">${currentUser.email}</p>
+              <p class="profile-username">@${currentUser.username}</p>
+            </div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-number">${favoriteCount}</div>
+              <div class="stat-label">Favorites</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">${tripsCount}</div>
+              <div class="stat-label">Trip Plans</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">${contactsCount}</div>
+              <div class="stat-label">Messages Sent</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number">${calculateDaysActive(currentUser.createdAt)}</div>
+              <div class="stat-label">Days Active</div>
+            </div>
+          </div>
+
+          <div class="profile-details">
+            <div class="profile-section">
+              <h3>Account Information</h3>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <strong>First Name:</strong>
+                  <span>${currentUser.firstName || 'Not set'}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Last Name:</strong>
+                  <span>${currentUser.lastName || 'Not set'}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Username:</strong>
+                  <span>@${currentUser.username}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Email:</strong>
+                  <span>${currentUser.email}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Member Since:</strong>
+                  <span>${memberSince}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Last Login:</strong>
+                  <span>${lastLogin}</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Email Status:</strong>
+                  <span class="status-verified">✅ Verified</span>
+                </div>
+                <div class="detail-item">
+                  <strong>Newsletter:</strong>
+                  <span>${currentUser.newsletter ? '✅ Subscribed' : '❌ Not Subscribed'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h3>Quick Actions</h3>
+              <div class="actions-grid">
+                <button class="action-btn" onclick="showMyFavorites()">
+                  <div class="action-icon">❤️</div>
+                  <div class="action-text">
+                    <strong>View Favorites</strong>
+                    <small>${favoriteCount} saved destinations</small>
+                  </div>
+                </button>
+                <button class="action-btn" onclick="showMyTrips()">
+                  <div class="action-icon">🎯</div>
+                  <div class="action-text">
+                    <strong>My Trips</strong>
+                    <small>${tripsCount} planned trips</small>
+                  </div>
+                </button>
+                <a href="destinations.html" class="action-btn">
+                  <div class="action-icon">🔍</div>
+                  <div class="action-text">
+                    <strong>Explore</strong>
+                    <small>Discover new destinations</small>
+                  </div>
+                </a>
+                <button class="action-btn" onclick="editProfile()">
+                  <div class="action-icon">✏️</div>
+                  <div class="action-text">
+                    <strong>Edit Profile</strong>
+                    <small>Update your information</small>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h3>Recent Activity</h3>
+              <div class="activity-list">
+                ${generateActivityList(currentUser, favorites, trips, contacts)}
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h3>Account Settings</h3>
+              <div class="settings-list">
+                <div class="setting-item">
+                  <div>
+                    <strong>Email Notifications</strong>
+                    <p>Receive updates about travel deals and new destinations</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" ${currentUser.newsletter ? 'checked' : ''} onchange="toggleNewsletter(this)" />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="setting-item">
+                  <div>
+                    <strong>Remember Me</strong>
+                    <p>Stay signed in for 7 days</p>
+                  </div>
+                  <span class="setting-status">✅ Active</span>
+                </div>
+                <div class="setting-item danger">
+                  <div>
+                    <strong>Delete Account</strong>
+                    <p>Permanently delete your account and all data</p>
+                  </div>
+                  <button class="danger-btn" onclick="deleteAccount()">Delete Account</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function getUserInitials(name) {
+      if (!name) return 'U';
+      const parts = name.split(' ').filter(p => p);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+      }
+      return (name[0] || 'U').toUpperCase();
+    }
+
+    function generateActivityList(user, favorites, trips, contacts) {
+      const activities = [];
+
+      // Add recent favorites
+      if (favorites && favorites.length > 0) {
+        const recentFav = favorites[favorites.length - 1];
+        const destination = DESTINATIONS.find(d => d.id === recentFav);
+        if (destination) {
+          activities.push({
+            icon: '❤️',
+            text: `Added "${destination.name}" to favorites`,
+            time: 'Recently'
+          });
+        }
+      }
+
+      // Add recent trips
+      if (trips && trips.length > 0) {
+        const recentTrip = trips[trips.length - 1];
+        activities.push({
+          icon: '🎯',
+          text: `Planned trip to ${recentTrip.destination || 'a destination'}`,
+          time: formatDateRelative(recentTrip.date)
+        });
+      }
+
+      // Add recent contacts
+      if (contacts && contacts.length > 0) {
+        const recentContact = contacts[contacts.length - 1];
+        activities.push({
+          icon: '📧',
+          text: `Sent message: "${recentContact.subject || 'Inquiry'}"`,
+          time: formatDateRelative(recentContact.date)
+        });
+      }
+
+      // Add account creation
+      if (user.createdAt) {
+        activities.push({
+          icon: '🎉',
+          text: 'Joined Traveloop community',
+          time: formatDateRelative(user.createdAt)
+        });
+      }
+
+      if (activities.length === 0) {
+        return '<p class="no-activity">No recent activity yet. Start exploring destinations!</p>';
+      }
+
+      return activities.map(activity => `
+        <div class="activity-item">
+          <div class="activity-icon">${activity.icon}</div>
+          <div class="activity-content">
+            <div class="activity-text">${activity.text}</div>
+            <div class="activity-time">${activity.time}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function calculateDaysActive(createdAt) {
+      if (!createdAt) return 0;
+      const created = new Date(createdAt);
+      const now = new Date();
+      const diffTime = Math.abs(now - created);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays || 1;
+    }
+
+    function formatDateRelative(dateString) {
+      if (!dateString) return 'Unknown';
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffTime = Math.abs(now - date);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) return 'Today';
+      if (diffDays === 1) return 'Yesterday';
+      if (diffDays < 7) return `${diffDays} days ago`;
+      if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+      return date.toLocaleDateString();
+    }
+
+    function showMyFavorites() {
+      const favorites = JSON.parse(localStorage.getItem('Traveloop_favorites') || '[]');
+      if (favorites.length === 0) {
+        alert('You haven\'t saved any favorites yet!\n\nBrowse destinations and click the heart icon to save them.');
+        return;
+      }
+      
+      const favDestinations = favorites.map(id => {
+        const dest = DESTINATIONS.find(d => d.id === id);
+        return dest ? dest.name : id;
+      }).join('\n• ');
+      
+      alert(`Your Favorites:\n\n• ${favDestinations}\n\nTotal: ${favorites.length} destinations`);
+    }
+
+    function showMyTrips() {
+      const trips = JSON.parse(localStorage.getItem('Traveloop_trips') || '[]');
+      if (trips.length === 0) {
+        alert('You haven\'t planned any trips yet!\n\nStart planning your next adventure!');
+        return;
+      }
+      
+      const tripList = trips.map((trip, i) => {
+        return `${i + 1}. ${trip.destination || 'Trip'}\n   Date: ${trip.date || 'Not set'}\n   Budget: $${trip.budget || 'N/A'}`;
+      }).join('\n\n');
+      
+      alert(`Your Trip Plans:\n\n${tripList}\n\nTotal: ${trips.length} trips`);
+    }
+
+    function editProfile() {
+      alert('Profile editing feature coming soon!\n\nYou\'ll be able to:\n• Update your personal information\n• Change your profile picture\n• Modify preferences\n• Update contact details');
+    }
+
+    function toggleNewsletter(checkbox) {
+      const currentUser = getCurrentUser();
+      if (!currentUser) return;
+
+      // Update user in localStorage
+      const users = JSON.parse(localStorage.getItem('Traveloop_users') || '[]');
+      const updatedUsers = users.map(u => {
+        if (u.id === currentUser.id) {
+          u.newsletter = checkbox.checked;
+          // Update current user session
+          currentUser.newsletter = checkbox.checked;
+          localStorage.setItem('Traveloop_user', JSON.stringify(currentUser));
+          return u;
+        }
+        return u;
+      });
+      localStorage.setItem('Traveloop_users', JSON.stringify(updatedUsers));
+
+      // Show confirmation
+      const message = checkbox.checked ? 
+        'You have been subscribed to our newsletter!' : 
+        'You have been unsubscribed from our newsletter.';
+      
+      setTimeout(() => alert(message), 100);
+    }
+
+    function deleteAccount() {
+      const confirmation = confirm(
+        'Are you sure you want to delete your account?\n\n' +
+        'This action will:\n' +
+        '• Permanently delete your profile\n' +
+        '• Remove all your favorites and trips\n' +
+        '• Delete your contact history\n\n' +
+        'This action cannot be undone!'
+      );
+
+      if (confirmation) {
+        const doubleConfirm = prompt(
+          'Type "DELETE" to confirm account deletion:'
+        );
+
+        if (doubleConfirm === 'DELETE') {
+          const currentUser = getCurrentUser();
+          if (currentUser) {
+            // Remove user from users array
+            const users = JSON.parse(localStorage.getItem('Traveloop_users') || '[]');
+            const updatedUsers = users.filter(u => u.id !== currentUser.id);
+            localStorage.setItem('Traveloop_users', JSON.stringify(updatedUsers));
+            
+            // Clear all localStorage data
+            localStorage.removeItem('Traveloop_token');
+            localStorage.removeItem('Traveloop_user');
+            localStorage.removeItem('Traveloop_favorites');
+            localStorage.removeItem('Traveloop_trips');
+            localStorage.removeItem('Traveloop_contacts');
+            
+            // Redirect to home
+            alert('Your account has been successfully deleted.');
+            window.location.href = 'index.html';
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
+

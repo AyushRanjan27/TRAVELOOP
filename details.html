@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Traveloop - Details</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+
+  <nav class="nav container">
+    <div class="brand">Traveloop</div>
+    <ul class="nav-links" id="mainNavLinks">
+      <!-- Navigation will be updated by JavaScript based on login state -->
+      <li><a href="index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="gallery.html">Gallery</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="login.html">Sign In</a></li>
+      <li><a href="signup.html">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <div id="detail-box" class="details fade-in"></div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="brand">Traveloop</div>
+      <ul class="links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="destinations.html">Destinations</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+      <div class="copyright">
+        © <span id="year3"></span> Traveloop — Explore with confidence
+      </div>
+    </div>
+  </footer>
+
+
+  <script>
+    // Wait for DOM to be ready before loading details
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDetailsPage();
+    });
+  </script>
+</body>
+</html>
+

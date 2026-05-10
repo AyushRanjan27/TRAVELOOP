@@ -1,0 +1,240 @@
+# Traveloop Deployment Guide
+
+## Deployment Options
+
+### Option 1: Render.com (Recommended - Free Tier)
+
+#### Deploy Backend
+1. Push your code to GitHub
+2. Create account at [render.com](https://render.com)
+3. Create a new Web Service:
+   - Connect your GitHub repository
+   - Build Command: `cd backend && npm install`
+   - Start Command: `cd backend && node server.js`
+4. Add Environment Variables:
+   - `MONGODB_URI`: Your MongoDB Atlas connection string
+   - `JWT_SECRET`: Your secret key
+   - `JWT_EXPIRE`: `7d`
+   - `PORT`: `10000` (Render assigns this)
+   - `NODE_ENV`: `production`
+5. Create MongoDB Atlas database and whitelist Render's IP
+
+#### Deploy Frontend
+1. In Render, create another Web Service for frontend
+2. Or use Render's Static Sites feature:
+   - Connect same repository
+   - Build Command: (empty)
+   - Start Command: (empty)
+   - Publish Directory: `.` (root with HTML files)
+
+#### Update API URL
+After deploying backend, note your backend URL (e.g., `https://Traveloop-api.onrender.com`):
+- In frontend, the API will auto-detect if `window.ENV.API_URL` is set
+- Or update `localStorage.setItem('Traveloop_api_url', 'YOUR_BACKEND_URL')` in browser console
+
+---
+
+### Option 2: Railway.app
+
+#### Quick Deploy
+1. Install Railway CLI: `npm install -g @railway/cli`
+2. Login: `railway login`
+3. Initialize: `railway init`
+4. Add MongoDB plugin: `railway add mongodb`
+5. Deploy: `railway up`
+
+#### Environment Variables (set in Railway dashboard)
+- `JWT_SECRET`: Your secret
+- `JWT_EXPIRE`: `7d`
+- `NODE_ENV`: `production`
+
+---
+
+### Option 3: Vercel + MongoDB Atlas
+
+#### Frontend (Vercel)
+1. Install Vercel CLI: `npm i -g vercel`
+2. Connect: `vercel`
+3. For production: `vercel --prod`
+
+#### Backend (Vercel Serverless Functions)
+Create `api/` directory structure:
+```
+api/
+├── index.js          # Express server
+├── package.json
+└── vercel.json
+```
+
+`vercel.json`:
+```json
+{
+  "builds": [{ "src": "api/**/*.js", "use": "@vercel/node" }],
+  "routes": [{ "src": "/api/(.*)", "dest": "/api/index.js" }]
+}
+```
+
+---
+
+### Option 4: Heroku + MongoDB Atlas
+
+#### Setup Heroku
+```bash
+# Install Heroku CLI
+brew install heroku/brew/heroku
+
+# Login and create app
+heroku login
+heroku create Traveloop-app
+
+# Add MongoDB Atlas add-on or use external URI
+heroku config:set MONGODB_URI="your-atlas-uri"
+heroku config:set JWT_SECRET="your-secret"
+heroku config:set JWT_EXPIRE="7d"
+heroku config:set NODE_ENV="production"
+
+# Deploy
+git push heroku main
+```
+
+#### Procfile (in backend/):
+```
+web: node server.js
+```
+
+---
+
+### Option 5: DigitalOcean App Platform
+
+1. Create account at [digitalocean.com](https://digitalocean.com)
+2. Create App → Connect GitHub repo
+3. Configure:
+   - Build Command: `cd backend && npm install`
+   - Run Command: `cd backend && node server.js`
+4. Add Environment Variables
+5. Add MongoDB database (DigitalOcean managed or Atlas)
+6. Deploy
+
+---
+
+## MongoDB Atlas Setup (Required for all cloud deployments)
+
+1. Create free account at [mongodb.com/atlas](https://www.mongodb.com/atlas)
+2. Create free cluster (M0 tier)
+3. Create database user (username/password)
+4. Network Access → Add IP whitelist (`0.0.0.0/0` for all IPs)
+5. Get connection string:
+   - Cluster → Connect → Connect your application
+   - Copy URI: `mongodb+srv://<user>:<password>@cluster.mongodb.net/Traveloop?retryWrites=true&w=majority`
+
+---
+
+## Environment Variables for Production
+
+Create `.env` file in `backend/` directory:
+
+```env
+# Server
+PORT=3000
+NODE_ENV=production
+
+# MongoDB
+MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/Traveloop
+
+# JWT
+JWT_SECRET=your-long-random-string-min-32-chars
+JWT_EXPIRE=7d
+
+# Frontend URL (for CORS)
+FRONTEND_URL=https://your-frontend-domain.com
+```
+
+---
+
+## Quick Deploy Script
+
+Create a deploy script:
+
+```bash
+#!/bin/bash
+# deploy.sh
+
+echo "Deploying Traveloop..."
+
+# Build frontend (if needed)
+echo "Building frontend..."
+cd /path/to/Traveloop
+
+# Deploy to Render/Railway/Heroku
+echo "Deploying to cloud..."
+git push origin main
+# or use platform-specific CLI
+
+echo "Deployment complete!"
+echo "Don't forget to:"
+echo "1. Set environment variables in your cloud platform"
+echo "2. Update CORS origins if needed"
+echo "3. Test the API endpoints"
+```
+
+---
+
+## Testing Your Deployment
+
+After deployment, test these endpoints:
+
+```bash
+# Base URL (replace with your deployed URL)
+BASE_URL="https://your-app.herokuapp.com"
+
+# Test health
+curl $BASE_URL/api
+
+# Test destinations
+curl $BASE_URL/api/destinations/featured
+
+# Test (should fail without auth)
+curl $BASE_URL/api/users/profile
+```
+
+---
+
+## Troubleshooting
+
+### CORS Errors
+- Ensure `FRONTEND_URL` is set correctly in backend env vars
+- Check that frontend URL matches exactly (no trailing slash)
+
+### MongoDB Connection Failed
+- Verify IP whitelist in MongoDB Atlas
+- Check connection string format
+- Ensure database user has correct permissions
+
+### JWT Errors
+- Make sure `JWT_SECRET` is set and consistent
+- Clear browser localStorage and re-login
+
+### Static Files Not Loading
+- Ensure HTML files are in the correct directory
+- Check that your hosting platform serves static files
+- Verify file paths in HTML (use relative paths)
+
+---
+
+## Performance Tips
+
+1. **Enable compression** in Express:
+   ```js
+   const compression = require('compression');
+   app.use(compression());
+   ```
+
+2. **Cache static assets**:
+   ```js
+   app.use(express.static('css', { maxAge: '1d' }));
+   ```
+
+3. **Use CDN for images** (already using Unsplash URLs)
+
+4. **Enable Gzip compression** on your hosting platform
+
