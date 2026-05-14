@@ -216,5 +216,5 @@ The frontend works completely standalone:
 
 ## License
 
-MIT License - Umeshwar Raj
+MIT License - Ayush Ranjan
 
