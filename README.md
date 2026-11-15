@@ -1,4 +1,4 @@
-# Traveloop - Full Stack Travel Planning Application
+# Traveloop - Full Stack Travel Planning Application!
 
 A modern travel planning web application built with Node.js, Express, MongoDB, and vanilla JavaScript.
 
